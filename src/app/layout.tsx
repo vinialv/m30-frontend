@@ -1,7 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next'
 import { Mukta } from 'next/font/google'
 
-import "./globals.css";
+import './globals.css'
+import { Providers } from '@/providers'
+import { Header } from '@/components/core/Header'
+import { ThemeValidation } from '@/utils/theme-validation'
 
 const mukta = Mukta({
   subsets: ['latin'],
@@ -18,18 +21,24 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html
       lang='pt-BR'
       suppressHydrationWarning
     >
-      <head></head>
-      <body className={`${mukta.className} antialiased flex flex-col h-dvh`}>
-        <header></header>
-        <main className='flex bg-background justify-center items-center h-full'>{children}</main>
-      </body>
+      <Providers>
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: ThemeValidation }} />
+        </head>
+        <body className={`${mukta.className} antialiased flex flex-col h-dvh`}>
+          <header>
+            <Header />
+          </header>
+          <main className='flex bg-background justify-center items-center h-full'>{children}</main>
+        </body>
+      </Providers>
     </html>
-  );
+  )
 }
