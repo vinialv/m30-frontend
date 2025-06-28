@@ -28,17 +28,17 @@ export default function RootLayout({
       lang='pt-BR'
       suppressHydrationWarning
     >
-      <Providers>
-        <head>
-          <script dangerouslySetInnerHTML={{ __html: ThemeValidation }} />
-        </head>
-        <body className={`${mukta.className} antialiased flex flex-col h-dvh`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: ThemeValidation }} />
+      </head>
+      <body className={`${mukta.className} antialiased flex flex-col h-dvh`}>
+        <Providers>
           <header>
             <Header />
           </header>
           <main className='flex bg-background justify-center items-center h-full'>{children}</main>
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   )
 }
