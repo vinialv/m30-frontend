@@ -1,12 +1,5 @@
 'use client'
 
-import { useTransition } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-
-import { PaginationProps } from '@/types/pagination'
-
-import { useMediaQuery } from '@/hooks/useMediaQuery'
-
 import {
   Pagination as PaginationComponent,
   PaginationContent,
@@ -16,6 +9,18 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useTransition } from 'react'
+
+type PaginationProps = {
+  links: {
+    url: string | null
+    label: string
+    active: boolean
+  }[]
+  lastPage: number
+}
 
 export function Pagination({ links, lastPage }: PaginationProps) {
   const [isPending, startTransition] = useTransition()

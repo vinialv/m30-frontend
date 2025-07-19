@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { HttpClientAdapter, HttpRequest, HttpResponse, CacheOption } from '../http'
+import { SearchParamsProps } from '@/types/search-params'
 
 export class FetchHttpClientAdapter implements HttpClientAdapter {
   private readonly baseURL: string
@@ -50,7 +51,7 @@ export class FetchHttpClientAdapter implements HttpClientAdapter {
               },
             }
           : {}),
-        ...(data.cache === 'force-cache' ? { cache: 'force-cache' } : {}),
+        ...(data.cache === 'no-store' ? { cache: 'no-store' } : {}),
       }
 
       const res = await fetch(url.toString(), fetchOptions)
@@ -73,7 +74,7 @@ export class FetchHttpClientAdapter implements HttpClientAdapter {
 
   async get<TResponse = any>(
     url: string,
-    params?: Record<string, any>,
+    params?: SearchParamsProps,
     cache?: CacheOption
   ): Promise<HttpResponse<TResponse>> {
     return this.request<TResponse>({ url, method: 'get', params, cache })
@@ -82,7 +83,7 @@ export class FetchHttpClientAdapter implements HttpClientAdapter {
   async post<TResponse = any, TBody = any>(
     url: string,
     body?: TBody,
-    params?: Record<string, any>,
+    params?: SearchParamsProps,
     cache?: CacheOption
   ): Promise<HttpResponse<TResponse>> {
     return this.request<TResponse, TBody>({ url, method: 'post', body, params, cache })
@@ -91,7 +92,7 @@ export class FetchHttpClientAdapter implements HttpClientAdapter {
   async put<TResponse = any, TBody = any>(
     url: string,
     body?: TBody,
-    params?: Record<string, any>,
+    params?: SearchParamsProps,
     cache?: CacheOption
   ): Promise<HttpResponse<TResponse>> {
     return this.request<TResponse, TBody>({ url, method: 'put', body, params, cache })
@@ -99,7 +100,7 @@ export class FetchHttpClientAdapter implements HttpClientAdapter {
 
   async delete<TResponse = any>(
     url: string,
-    params?: Record<string, any>,
+    params?: SearchParamsProps,
     cache?: CacheOption
   ): Promise<HttpResponse<TResponse>> {
     return this.request<TResponse>({ url, method: 'delete', params, cache })

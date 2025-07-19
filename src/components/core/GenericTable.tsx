@@ -10,12 +10,12 @@ import { TableBody, TableCell, TableFooter, TableRow } from '@/components/ui/tab
 import { Pagination } from '@/components/core/Pagination'
 
 interface GenericTableProps<T> {
-  searchParams: SearchParamsProps
+  searchParams: Promise<SearchParamsProps>
   fetcher: (params: SearchParamsProps) => Promise<{
     data: T[]
     meta: MetaData
   }>
-  renderRow: (item: T) => React.ReactNode
+  renderRow: (item: T) => React.ReactNode | React.ReactNode[]
   rowKey: (item: T) => string | number
   columns: number
   emptyMessage?: string
@@ -31,15 +31,17 @@ export async function GenericTable<T>({
   emptyMessage = 'Nenhum registro encontrado.',
   showFooter = true,
 }: GenericTableProps<T>) {
-  const { data, meta } = await fetcher(searchParams)
+  const params = await searchParams
+  const { data, meta } = await fetcher(params)
 
-  if (data.length === 0 && Number(searchParams.page) > 1) {
-    const newPage = Number(searchParams.page) - 1
+  const currentPage = Number(params.page) || 1
+
+  if (data.length === 0 && currentPage > 1) {
+    const newPage = currentPage - 1
     const query = new URLSearchParams({
-      ...searchParams,
+      ...params,
       page: newPage.toString(),
     }).toString()
-
     redirect(`?${query}`)
   }
 
@@ -50,7 +52,11 @@ export async function GenericTable<T>({
           <TableCell colSpan={columns}>
             <div className='flex flex-col h-[500px] w-full justify-center items-center gap-4'>
               <SearchX className='text-accent-foreground/15' />
-              <span className='text-accent-foreground/20 text-lg font-light tracking-wide'>
+              <span
+                className='text-accent-foreground/20 text-lg font-light tracking-wide'
+                role='status'
+                aria-live='polite'
+              >
                 {emptyMessage}
               </span>
             </div>
@@ -64,7 +70,7 @@ export async function GenericTable<T>({
     <>
       <TableBody>
         {data.map((item) => (
-          <TableRow key={rowKey(item)}>{renderRow(item)}</TableRow>
+          <TableRow key={String(rowKey(item))}>{renderRow(item)}</TableRow>
         ))}
       </TableBody>
 

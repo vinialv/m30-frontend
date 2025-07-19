@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, cloneElement, isValidElement, ReactNode, ReactElement } from 'react'
 import { MoreHorizontal, SquarePen, Trash2 } from 'lucide-react'
 
 import {
@@ -10,79 +10,90 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-
 import { ResponsiveDialog } from '@/components/core/ResponsiveDialog'
 
 type ActionItem<T> = {
   label: string
-  icon?: React.ReactNode
+  icon?: ReactNode
   onClick?: (item: T) => void
   variant?: 'default' | 'danger'
+  disabled?: boolean
 }
 
 type TableRowActionsProps<T> = {
   item: T
   actions?: ActionItem<T>[]
-  renderEditForm?: (props: { item: T; close: () => void }) => React.ReactNode
-  renderDeleteForm?: (props: { item: T; close: () => void }) => React.ReactNode
   editTitle?: string
   deleteTitle?: string
   deleteDescription?: string
+  editFormComponent?: ReactNode
+  deleteFormComponent?: ReactNode
 }
 
 export function TableRowActions<T>({
   item,
   actions = [],
-  renderEditForm,
-  renderDeleteForm,
   editTitle = 'Editar',
   deleteTitle = 'Excluir',
   deleteDescription = 'Você tem certeza que deseja excluir este registro?',
+  editFormComponent,
+  deleteFormComponent,
 }: TableRowActionsProps<T>) {
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
-  const defaultActions: ActionItem<T>[] = []
+  const defaultActions = useMemo((): ActionItem<T>[] => {
+    const defaultItems: ActionItem<T>[] = []
 
-  if (renderEditForm) {
-    defaultActions.push({
-      label: editTitle,
-      icon: <SquarePen className='h-4 w-4' />,
-      onClick: () => setIsEditOpen(true),
-    })
-  }
+    if (editFormComponent) {
+      defaultItems.push({
+        label: editTitle,
+        icon: <SquarePen className='h-4 w-4' />,
+        onClick: () => setIsEditOpen(true),
+      })
+    }
 
-  if (renderDeleteForm) {
-    defaultActions.push({
-      label: deleteTitle,
-      icon: <Trash2 className='h-4 w-4' />,
-      onClick: () => setIsDeleteOpen(true),
-      variant: 'danger',
-    })
-  }
+    if (deleteFormComponent) {
+      defaultItems.push({
+        label: deleteTitle,
+        icon: <Trash2 className='h-4 w-4' />,
+        onClick: () => setIsDeleteOpen(true),
+        variant: 'danger',
+      })
+    }
+
+    return defaultItems
+  }, [editFormComponent, deleteFormComponent, editTitle, deleteTitle])
 
   const combinedActions = [...actions, ...defaultActions]
 
+  function injectClose(child: ReactNode, closeFn: () => void): ReactNode {
+    if (isValidElement<{ closeModal: () => void }>(child)) {
+      return cloneElement(child, { closeModal: closeFn })
+    }
+    return child
+  }
+
   return (
     <>
-      {renderEditForm && (
+      {editFormComponent && (
         <ResponsiveDialog
           isOpen={isEditOpen}
           setIsOpen={setIsEditOpen}
           title={editTitle}
         >
-          {renderEditForm({ item, close: () => setIsEditOpen(false) })}
+          {injectClose(editFormComponent, () => setIsEditOpen(false))}
         </ResponsiveDialog>
       )}
 
-      {renderDeleteForm && (
+      {deleteFormComponent && (
         <ResponsiveDialog
           isOpen={isDeleteOpen}
           setIsOpen={setIsDeleteOpen}
           title={deleteTitle}
           description={deleteDescription}
         >
-          {renderDeleteForm({ item, close: () => setIsDeleteOpen(false) })}
+          {injectClose(deleteFormComponent, () => setIsDeleteOpen(false))}
         </ResponsiveDialog>
       )}
 
@@ -103,11 +114,16 @@ export function TableRowActions<T>({
         >
           {combinedActions.map((action, index) => (
             <DropdownMenuItem
-              key={index}
-              onClick={() => action.onClick?.(item)}
-              className={`group text-sm p-2 flex items-center gap-2 ${
-                action.variant === 'danger' ? 'text-red-500' : 'text-neutral-600'
-              }`}
+              key={`${action.label}-${index}`}
+              onClick={() => !action.disabled && action.onClick?.(item)}
+              disabled={action.disabled}
+              className={`group text-sm p-2 flex items-center gap-2 rounded
+                ${
+                  action.variant === 'danger'
+                    ? 'text-red-500 hover:text-red-600'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }
+              `}
             >
               {action.icon}
               {action.label}

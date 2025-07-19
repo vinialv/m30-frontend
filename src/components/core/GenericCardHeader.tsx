@@ -14,6 +14,7 @@ import { CardTitle } from '@/components/ui/card'
 import { SearchInput } from '@/components/core/SearchInput'
 import { StatusFilter } from '@/components/core/StatusFilter'
 import { ResponsiveDialog } from '@/components/core/ResponsiveDialog'
+import { toast } from 'react-toastify'
 
 interface GenericCardHeaderProps {
   title: string
@@ -52,7 +53,7 @@ export function GenericCardHeader({
       <CardTitle>{title}</CardTitle>
 
       <div className='flex justify-between pt-3 gap-2 flex-col md:flex-row'>
-        <div className='flex w-full gap-2 pr-2'>
+        <div className='flex w-full gap-2'>
           {showSearch && <SearchInput placeholder={searchPlaceholder} />}
           {showStatusFilter && (
             <StatusFilter
@@ -60,26 +61,26 @@ export function GenericCardHeader({
               dropdownOptions={statusDropdownOptions}
             />
           )}
-        </div>
 
-        <div className='flex'>
-          <Button
-            variant='outline'
-            aria-label={`Cadastrar ${descriptionButtonCreation}`}
-            className='flex gap-2 bg-card text-foreground font-light'
-            onClick={() => setIsOpen(true)}
-          >
-            <CirclePlus />
-            {isDesktop && descriptionButtonCreation}
-          </Button>
+          <div className='flex'>
+            <Button
+              variant='outline'
+              aria-label={`Cadastrar ${descriptionButtonCreation}`}
+              className='flex gap-2 bg-card text-foreground font-light'
+              onClick={() => setIsOpen(true)}
+            >
+              <CirclePlus />
+              {isDesktop && descriptionButtonCreation}
+            </Button>
 
-          <ResponsiveDialog
-            title={`Cadastrar ${descriptionButtonCreation}`}
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-          >
-            {childrenWithProps}
-          </ResponsiveDialog>
+            <ResponsiveDialog
+              title={`Cadastrar ${descriptionButtonCreation}`}
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+            >
+              {childrenWithProps}
+            </ResponsiveDialog>
+          </div>
         </div>
       </div>
     </>
