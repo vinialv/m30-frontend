@@ -6,13 +6,17 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Menu } from './Menu'
 import { ThemeToggle } from './ThemeToggle'
 import { Button } from '@/components/ui/button'
+import { deleteToken } from '@/services/auth/delete-token'
 
 export function Header() {
   const router = useRouter()
   const pathname = usePathname()
 
   function handleSignOut() {
-    setTimeout(() => {}, 100)
+    deleteToken()
+    setTimeout(() => {
+      router.push('/login')
+    }, 100)
   }
 
   if (pathname === '/login') {

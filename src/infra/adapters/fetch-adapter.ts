@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { HttpClientAdapter, HttpRequest, HttpResponse, CacheOption } from '../http'
 import { SearchParamsProps } from '@/types/search-params'
+import { getToken } from '@/services/auth/get-token'
 
 export class FetchHttpClientAdapter implements HttpClientAdapter {
   private readonly baseURL: string
@@ -9,17 +10,11 @@ export class FetchHttpClientAdapter implements HttpClientAdapter {
     this.baseURL = process.env.API_URL || ''
   }
 
-  private async getTokenFromCookie(): Promise<string | null> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('token')
-    return token?.value || null
-  }
-
   async request<TResponse = any, TBody = any>(
     data: HttpRequest<TBody>
   ): Promise<HttpResponse<TResponse>> {
     try {
-      const token = await this.getTokenFromCookie()
+      const token = await getToken()
 
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
