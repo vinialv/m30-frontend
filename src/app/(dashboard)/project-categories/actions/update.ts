@@ -10,10 +10,10 @@ const schema = z.object({
   status: z.enum(['A', 'I'], { message: 'Status é obrigatório' }),
 })
 
-export async function updateCategoryAction(_: unknown, formData: FormData) {
+export async function updateCategoryAction(_: unknown, data: FormData) {
   const parsed = schema.safeParse({
-    description: formData.get('description'),
-    status: formData.get('status'),
+    description: data.get('description'),
+    status: data.get('status'),
   })
 
   if (!parsed.success) {
@@ -25,14 +25,12 @@ export async function updateCategoryAction(_: unknown, formData: FormData) {
   }
 
   const projectCategorySelected: ProjectCategoryProps = {
-    id: Number(formData.get('id')),
-    description: formData.get('description') as string,
-    status: formData.get('status') as 'A' | 'I',
+    id: Number(data.get('id')),
+    description: data.get('description') as string,
+    status: data.get('status') as 'A' | 'I',
   }
 
   const response = await update(projectCategorySelected)
-
-  console.log('Response from update action:', response)
 
   if (response.statusCode === 200) {
     revalidatePath('/project-categories')

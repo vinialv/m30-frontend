@@ -4,24 +4,21 @@ import { useActionState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { LoaderCircle } from 'lucide-react'
 import { useToast } from '@/hooks/useToast'
+import { deleteCategoryAction } from '@/app/(dashboard)/project-categories/actions/delete'
 import { FormActionResponse } from '@/types/project-categories'
-import { useRouter } from 'next/navigation'
 
 interface GenericDeleteFormProps {
   id: number
-  action: (formData: FormData) => Promise<any>
   closeModal?: () => void
 }
 
-export function GenericDeleteForm({ id, action, closeModal }: GenericDeleteFormProps) {
-  const router = useRouter()
+export function GenericDeleteForm({ id, closeModal }: GenericDeleteFormProps) {
   const { toastSuccess, toastError } = useToast()
-  const [state, formAction, isPending] = useActionState<FormActionResponse, FormData>(
-    async (_state, formData) => await action(formData),
+
+  const [state, handleDeleteAction, isPending] = useActionState<FormActionResponse, FormData>(
+    deleteCategoryAction,
     {}
   )
-
-  console.log(state)
 
   useEffect(() => {
     if (Object.keys(state).length === 0) return
@@ -29,14 +26,13 @@ export function GenericDeleteForm({ id, action, closeModal }: GenericDeleteFormP
     if (state?.success) {
       toastSuccess(state?.message || 'Registro excluído com sucesso.')
       closeModal?.()
-      router.refresh()
     } else if (state?.statusCode) {
       toastError(state?.message || 'Erro ao excluir o registro.')
     }
   }, [state])
 
   return (
-    <form action={formAction}>
+    <form action={handleDeleteAction}>
       <input
         type='hidden'
         name='id'

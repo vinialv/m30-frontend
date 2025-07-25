@@ -1,20 +1,14 @@
 'use client'
 
-import { useState, useMemo, cloneElement, isValidElement, ReactNode, ReactElement } from 'react'
-import { MoreHorizontal, SquarePen, Trash2 } from 'lucide-react'
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import { ResponsiveDialog } from '@/components/core/ResponsiveDialog'
+import { useState, useMemo } from 'react'
+import { SquarePen, Trash2 } from 'lucide-react'
+import { EditDialogWrapper } from './EditDialogWrapper'
+import { DeleteDialogWrapper } from './DeleteDialogWrapper'
+import { ActionMenu } from './ActionMenu'
 
 type ActionItem<T> = {
   label: string
-  icon?: ReactNode
+  icon?: React.ReactNode
   onClick?: (item: T) => void
   variant?: 'default' | 'danger'
   disabled?: boolean
@@ -26,8 +20,8 @@ type TableRowActionsProps<T> = {
   editTitle?: string
   deleteTitle?: string
   deleteDescription?: string
-  editFormComponent?: ReactNode
-  deleteFormComponent?: ReactNode
+  editFormComponent?: (close: () => void) => React.ReactNode
+  deleteFormComponent?: (close: () => void) => React.ReactNode
 }
 
 export function TableRowActions<T>({
@@ -43,10 +37,10 @@ export function TableRowActions<T>({
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
   const defaultActions = useMemo((): ActionItem<T>[] => {
-    const defaultItems: ActionItem<T>[] = []
+    const defaults: ActionItem<T>[] = []
 
     if (editFormComponent) {
-      defaultItems.push({
+      defaults.push({
         label: editTitle,
         icon: <SquarePen className='h-4 w-4' />,
         onClick: () => setIsEditOpen(true),
@@ -54,7 +48,7 @@ export function TableRowActions<T>({
     }
 
     if (deleteFormComponent) {
-      defaultItems.push({
+      defaults.push({
         label: deleteTitle,
         icon: <Trash2 className='h-4 w-4' />,
         onClick: () => setIsDeleteOpen(true),
@@ -62,75 +56,36 @@ export function TableRowActions<T>({
       })
     }
 
-    return defaultItems
+    return defaults
   }, [editFormComponent, deleteFormComponent, editTitle, deleteTitle])
-
-  const combinedActions = [...actions, ...defaultActions]
-
-  function injectClose(child: ReactNode, closeFn: () => void): ReactNode {
-    if (isValidElement<{ closeModal: () => void }>(child)) {
-      return cloneElement(child, { closeModal: closeFn })
-    }
-    return child
-  }
 
   return (
     <>
       {editFormComponent && (
-        <ResponsiveDialog
+        <EditDialogWrapper
+          title={editTitle}
           isOpen={isEditOpen}
           setIsOpen={setIsEditOpen}
-          title={editTitle}
         >
-          {injectClose(editFormComponent, () => setIsEditOpen(false))}
-        </ResponsiveDialog>
+          {(close) => editFormComponent(close)}
+        </EditDialogWrapper>
       )}
 
       {deleteFormComponent && (
-        <ResponsiveDialog
-          isOpen={isDeleteOpen}
-          setIsOpen={setIsDeleteOpen}
+        <DeleteDialogWrapper
           title={deleteTitle}
           description={deleteDescription}
+          isOpen={isDeleteOpen}
+          setIsOpen={setIsDeleteOpen}
         >
-          {injectClose(deleteFormComponent, () => setIsDeleteOpen(false))}
-        </ResponsiveDialog>
+          {(close) => deleteFormComponent(close)}
+        </DeleteDialogWrapper>
       )}
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant='ghost'
-            className='h-8 w-8 p-0'
-          >
-            <span className='sr-only'>Abrir menu</span>
-            <MoreHorizontal className='h-4 w-4' />
-          </Button>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent
-          align='end'
-          className='w-[160px] z-50'
-        >
-          {combinedActions.map((action, index) => (
-            <DropdownMenuItem
-              key={`${action.label}-${index}`}
-              onClick={() => !action.disabled && action.onClick?.(item)}
-              disabled={action.disabled}
-              className={`group text-sm p-2 flex items-center gap-2 rounded
-                ${
-                  action.variant === 'danger'
-                    ? 'text-red-500 hover:text-red-600'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }
-              `}
-            >
-              {action.icon}
-              {action.label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <ActionMenu
+        item={item}
+        actions={[...actions, ...defaultActions]}
+      />
     </>
   )
 }

@@ -14,10 +14,9 @@ import {
 } from '@/components/ui/select'
 
 import { FormActionResponse, ProjectCategoryProps } from '@/types/project-categories'
-import { createCategoryAction } from '../app/(dashboard)/project-categories/actions/create'
-import { updateCategoryAction } from '../app/(dashboard)/project-categories/actions/update'
+import { createCategoryAction } from '../../app/(dashboard)/project-categories/actions/create'
+import { updateCategoryAction } from '../../app/(dashboard)/project-categories/actions/update'
 import { useToast } from '@/hooks/useToast'
-import { useRouter } from 'next/navigation'
 
 interface Props {
   mode: 'insert' | 'update'
@@ -27,7 +26,6 @@ interface Props {
 }
 
 export function ProjectCategoryForm({ mode, id, data, closeModal }: Props) {
-  const router = useRouter()
   const { toastSuccess, toastError } = useToast()
   const action = mode === 'update' && id ? updateCategoryAction : createCategoryAction
 
@@ -36,15 +34,9 @@ export function ProjectCategoryForm({ mode, id, data, closeModal }: Props) {
   useEffect(() => {
     if (Object.keys(state).length === 0) return
 
-    console.log('Form action state:', state)
-    console.log('state sucess?', state?.success)
-    console.log('closeModal recebido:', closeModal)
-
     if (state?.success) {
-      console.log('entrou no sucesso')
       toastSuccess(state?.message || 'Operação realizada com sucesso.')
       closeModal?.()
-      router.refresh()
     } else if (state?.statusCode) {
       toastError(state?.message || 'Ocorreu um erro ao processar a solicitação.')
     }

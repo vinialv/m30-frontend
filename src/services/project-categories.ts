@@ -60,14 +60,10 @@ export async function create(formData: CreateProjectCategoryDTO): Promise<Respon
 }
 
 export async function update(formData: ProjectCategoryProps): Promise<Response> {
-  console.log(formData)
-
   const response = await api.put<Response, ProjectCategoryProps>(
     `/project-category/${formData.id}`,
     formData
   )
-
-  console.log(response)
 
   if (response.statusCode === 200) {
     return {

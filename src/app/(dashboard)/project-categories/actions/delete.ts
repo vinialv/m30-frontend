@@ -1,25 +1,26 @@
 'use server'
 
 import { remove } from '@/services/project-categories'
+import { FormActionResponse } from '@/types/project-categories'
 import { revalidatePath } from 'next/cache'
 
-export async function deleteCategoryAction(formData: FormData) {
-  const idRaw = formData.get('id')
-  const id = Number(idRaw)
-
-  if (isNaN(id) || id <= 0) {
-    return {
-      success: false,
-      statusCode: 400,
-      message: 'ID inválido para exclusão.',
-    }
-  }
-
+export async function deleteCategoryAction(_: FormActionResponse, data: FormData) {
   try {
+    const idRaw = data.get('id')
+    const id = Number(idRaw)
+
+    if (isNaN(id) || id <= 0) {
+      return {
+        success: false,
+        statusCode: 400,
+        message: 'ID inválido para exclusão.',
+      }
+    }
+
     const response = await remove(id)
 
     if (response.statusCode === 200) {
-      revalidatePath('/project-categories')
+      //revalidatePath('/project-categories')
 
       return {
         success: true,
@@ -34,8 +35,6 @@ export async function deleteCategoryAction(formData: FormData) {
       }
     }
   } catch (error) {
-    console.error('Erro ao excluir categoria:', error)
-
     return {
       success: false,
       statusCode: 500,

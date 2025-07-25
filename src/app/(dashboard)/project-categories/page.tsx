@@ -5,18 +5,16 @@ import { ProjectCategoryProps } from '@/types/project-categories'
 
 import { GenericTable } from '@/components/core/GenericTable'
 import { SkeletonTable } from '@/components/core/SkeletonTable'
-import { TableRowActions } from '@/components/core/TableRowActions'
 import { GenericCardHeader } from '@/components/core/GenericCardHeader'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Table, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
-import { ProjectCategoryForm } from '@/forms/CreateUpdateProjectCategory'
+import { ProjectCategoryForm } from '@/components/project-categories/ProjectCategoryCreateUpdateForm'
 
 import { getAll } from '@/services/project-categories'
-import { GenericDeleteForm } from '@/forms/GenericDeleteForm'
-import { deleteCategoryAction } from './actions/delete'
+import { ProjectCategoryRowSetup } from '@/components/project-categories/ProjectCategoryTableRowSetup'
 
 export default async function ProjectCategories({
   searchParams,
@@ -74,23 +72,7 @@ export default async function ProjectCategories({
                     </Badge>
                   </TableCell>
                   <TableCell className='text-center'>
-                    <TableRowActions
-                      item={item}
-                      editFormComponent={
-                        <ProjectCategoryForm
-                          key={item.id}
-                          mode='update'
-                          id={item.id}
-                          data={item}
-                        />
-                      }
-                      deleteFormComponent={
-                        <GenericDeleteForm
-                          id={item.id}
-                          action={deleteCategoryAction}
-                        />
-                      }
-                    />
+                    <ProjectCategoryRowSetup item={item} />
                   </TableCell>
                 </>
               )}
