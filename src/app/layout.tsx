@@ -5,6 +5,7 @@ import './globals.css'
 import { Providers } from '@/providers'
 import { Header } from '@/components/core/Header'
 import { ThemeValidation } from '@/utils/theme-validation'
+import { Suspense } from 'react'
 
 const mukta = Mukta({
   subsets: ['latin'],
@@ -36,7 +37,11 @@ export default function RootLayout({
           <header>
             <Header />
           </header>
-          <main className='flex bg-background justify-center items-center h-full'>{children}</main>
+          <Suspense>
+            <main className='flex bg-background justify-center items-center h-full'>
+              {children}
+            </main>
+          </Suspense>
         </Providers>
       </body>
     </html>

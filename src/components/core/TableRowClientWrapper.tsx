@@ -2,14 +2,15 @@
 
 import { GenericDeleteForm } from '@/forms/GenericDeleteForm'
 import { TableRowActions } from './TableRowActions'
+import { TableRowClientWrapperProps } from '@/types/shared'
 
-type Props<T> = {
-  item: T
-  id: number
-  editFormComponent: (close: () => void) => React.ReactNode
-}
-
-export function TableRowClientWrapper<T>({ item, id, editFormComponent }: Props<T>) {
+export function TableRowClientWrapper<T>({
+  item,
+  id,
+  path,
+  editFormComponent,
+  deleteAction,
+}: TableRowClientWrapperProps<T>) {
   return (
     <TableRowActions
       item={item}
@@ -17,7 +18,9 @@ export function TableRowClientWrapper<T>({ item, id, editFormComponent }: Props<
       deleteFormComponent={(close) => (
         <GenericDeleteForm
           id={id}
+          path={path}
           closeModal={close}
+          deleteAction={deleteAction}
         />
       )}
     />

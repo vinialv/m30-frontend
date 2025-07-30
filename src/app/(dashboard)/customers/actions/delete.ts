@@ -1,12 +1,14 @@
 'use server'
 
-import { remove } from '@/services/project-categories'
-import { FormActionResponse } from '@/types/project-categories'
+import { remove } from '@/services/customers'
+import { FormActionResponse } from '@/types/customers'
 
-export async function deleteCategoryAction(_: FormActionResponse, data: FormData) {
+export async function deleteCustomerAction(_: FormActionResponse, data: FormData) {
   try {
+    console.log('data', data)
     const idRaw = data.get('id')
     const id = Number(idRaw)
+    console.log('id', id)
 
     if (isNaN(id) || id <= 0) {
       return {

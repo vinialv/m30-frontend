@@ -1,22 +1,17 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { startTransition, useActionState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { LoaderCircle } from 'lucide-react'
 import { useToast } from '@/hooks/useToast'
-import { deleteCategoryAction } from '@/app/(dashboard)/project-categories/actions/delete'
-import { FormActionResponse } from '@/types/project-categories'
+import { revalidateCache } from '@/actions/revalidate-cache'
+import { FormActionResponse, GenericDeleteFormProps } from '@/types/shared'
 
-interface GenericDeleteFormProps {
-  id: number
-  closeModal?: () => void
-}
-
-export function GenericDeleteForm({ id, closeModal }: GenericDeleteFormProps) {
+export function GenericDeleteForm({ id, path, closeModal, deleteAction }: GenericDeleteFormProps) {
   const { toastSuccess, toastError } = useToast()
 
   const [state, handleDeleteAction, isPending] = useActionState<FormActionResponse, FormData>(
-    deleteCategoryAction,
+    deleteAction,
     {}
   )
 
@@ -26,6 +21,11 @@ export function GenericDeleteForm({ id, closeModal }: GenericDeleteFormProps) {
     if (state?.success) {
       toastSuccess(state?.message || 'Registro excluído com sucesso.')
       closeModal?.()
+      startTransition(() => {
+        setTimeout(() => {
+          revalidateCache(path)
+        }, 0)
+      })
     } else if (state?.statusCode) {
       toastError(state?.message || 'Erro ao excluir o registro.')
     }

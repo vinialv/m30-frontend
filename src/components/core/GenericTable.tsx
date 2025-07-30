@@ -44,13 +44,15 @@ export async function GenericTable<T>({
     }).toString()
     redirect(`?${query}`)
   }
+  const emptyRows = Math.max(0, 10 - data.length)
+  console.log('Empty Rows:', emptyRows)
 
   if (data.length === 0) {
     return (
-      <TableBody className='h-full'>
+      <TableBody className='flex-1'>
         <TableRow>
           <TableCell colSpan={columns}>
-            <div className='flex flex-col h-[500px] w-full justify-center items-center gap-4'>
+            <div className='flex flex-1 w-full justify-center items-center gap-4 min-h-[200px]'>
               <SearchX className='text-accent-foreground/15' />
               <span
                 className='text-accent-foreground/20 text-lg font-light tracking-wide'
@@ -68,15 +70,25 @@ export async function GenericTable<T>({
 
   return (
     <>
-      <TableBody>
+      <TableBody className='flex-1'>
         {data.map((item) => (
           <TableRow key={String(rowKey(item))}>{renderRow(item)}</TableRow>
+        ))}
+        {Array.from({ length: emptyRows }).map((_, index) => (
+          <TableRow
+            key={`empty-${index}`}
+            className='hover:bg-transparent border-transparent'
+          >
+            <TableCell className='h-12' />
+            <TableCell className='h-12' />
+            <TableCell className='h-12' />
+          </TableRow>
         ))}
       </TableBody>
 
       {showFooter && (
-        <TableFooter>
-          <TableRow>
+        <TableFooter className='border-transparent'>
+          <TableRow className='hover:bg-transparent'>
             <TableCell
               colSpan={columns}
               className='pt-6 px-0'

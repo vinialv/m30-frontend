@@ -34,10 +34,10 @@ export default async function ProjectCategories({
           <ProjectCategoryForm mode='insert' />
         </GenericCardHeader>
       </CardHeader>
-      <CardContent className='h-full '>
-        <Table className='overflow-y-auto'>
+      <CardContent className='flex-1'>
+        <Table className='w-full'>
           <TableHeader>
-            <TableRow>
+            <TableRow className='hover:bg-transparent'>
               <TableHead className='w-80/100'>Descrição</TableHead>
               <TableHead className='min-w-28 w-10/100 text-center'>Situação</TableHead>
               <TableHead className='min-w-28 w-10/100 text-center'>Ações</TableHead>
